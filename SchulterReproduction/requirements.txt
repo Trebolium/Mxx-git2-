@@ -2,6 +2,7 @@ absl-py==0.7.1
 astor==0.8.0
 audioread==2.1.8
 certifi==2019.3.9
+cycler==0.10.0
 decorator==4.4.0
 ffmpeg==1.4
 gast==0.2.2
@@ -11,14 +12,18 @@ joblib==0.13.2
 Keras==2.2.4
 Keras-Applications==1.0.8
 Keras-Preprocessing==1.1.0
+kiwisolver==1.1.0
 librosa==0.6.3
 llvmlite==0.29.0
 Markdown==3.1.1
+matplotlib==3.1.0
 mock==3.0.5
 numba==0.44.0
 numpy==1.16.2
 protobuf==3.8.0
 pydub==0.23.1
+pyparsing==2.4.0
+python-dateutil==2.8.0
 PyYAML==5.1
 resampy==0.2.1
 scikit-learn==0.21.2
