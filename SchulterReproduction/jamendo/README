@@ -1,0 +1,21 @@
+Jamendo Corpus for Singing Voice Detection
+
+This is a public corpus of 93 creative-commons licensed music pieces annotated
+by voice (sung or spoken) and no-voice.
+
+Original source:
+http://www.mathieuramona.com/wp/data/jamendo/
+
+Citation:
+@inproceedings{Ramona2008_jamendo,
+  author = {Mathieu Ramona and Ga{\"e}l Richard and Bertrand David},
+  title = {Vocal detection in music with support vector machines},
+  booktitle = {Proceedings of the 33rd IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP)},
+  year = {2008},
+  pages = {1885--1888},
+  month = mar,
+  doi = {10.1109/ICASSP.2008.4518002},
+  ISSN = {1520-6149},
+  address = {Las Vegas, NV, USA},
+  url = {http://www.mathieuramona.com/uploads/Main/bibA03.pdf},
+}
