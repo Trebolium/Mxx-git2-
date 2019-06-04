@@ -159,7 +159,7 @@ def data_generator(dataset, num_steps, shuffle, h5_path, params):
                 		y.append(label)
                 		break
             # convert lists to arrays
-            print(x_data)
+            print(x_data.shape)
             x_data = np.asarray(x_data)
             y = np.asarray(y)
             # conv layers need image data format
