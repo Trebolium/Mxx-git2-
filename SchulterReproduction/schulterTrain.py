@@ -10,6 +10,7 @@ except ImportError:
 from keras.callbacks import ModelCheckpoint
 import os
 import matplotlib.pyplot as plt
+import sys
 
 params=load_parameters()
 
@@ -25,7 +26,7 @@ print(len(train_files), 'train files \n', len(val_files), 'validation files \n',
 
 
 # make sure we have the hdf5 data file
-hdf5_path = 'jamendo/jdataset.hdf5'
+hdf5_path = 'jamendo/' +sys.argv[1] +'.hdf5'
 if not os.path.isfile:
     print('ERROR: HDF5-file not found! Run create_hdf5_dataset.py first!')
     exit(0)
@@ -44,7 +45,7 @@ num_val_steps = params['num_train_steps'] * len(val_files)/len(train_files)
 
 # callbacks
 # save the best performing model
-save_best = ModelCheckpoint('trained_model.h5', monitor='val_loss', save_best_only=True)
+save_best = ModelCheckpoint(sys.argv[1] +'.h5', monitor='val_loss', save_best_only=True)
 
 # train
 history = model.fit_generator(data_generator('train', params['num_train_steps'], True, hdf5_path, params),
@@ -62,12 +63,12 @@ val_loss = history.history['val_loss']
 epochs = range(1, len(acc) + 1)
 plt.plot(epochs, acc, 'bo', label='Training acc')
 plt.plot(epochs, val_acc, 'b', label='Validation acc')
-plt.title('Training and validation accuracy')
+plt.title(sys.argv[1] +'Training and validation accuracy')
 plt.legend()
 
 plt.figure()
 plt.plot(epochs, loss, 'bo', label='Training loss')
 plt.plot(epochs, val_loss, 'b', label='Validation loss')
-plt.title('Training and validation loss')
+plt.title(sys.argv[1] +'Training and validation loss')
 plt.legend()
 plt.show()

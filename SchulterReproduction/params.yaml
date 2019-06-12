@@ -3,8 +3,8 @@ fs: 22050
 hop_length: 315
 n_fft: 1024
 n_mel: 80
-snippet_length_sec: 5
-min_clip: 0.0000007
+# snippet_length_sec: 5
+min_clip: 0.0000001
 fmin: 27.5
 fmax: 8000
 max_song_length: 450
