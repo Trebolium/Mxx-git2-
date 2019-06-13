@@ -26,7 +26,7 @@ print(len(train_files), 'train files \n', len(val_files), 'validation files \n',
 
 
 # make sure we have the hdf5 data file
-hdf5_path = 'jamendo/' +sys.argv[1] +'.hdf5'
+hdf5_path = 'hdf5data/' +sys.argv[1] +'.hdf5'
 if not os.path.isfile:
     print('ERROR: HDF5-file not found! Run create_hdf5_dataset.py first!')
     exit(0)
@@ -45,7 +45,7 @@ num_val_steps = params['num_train_steps'] * len(val_files)/len(train_files)
 
 # callbacks
 # save the best performing model
-save_best = ModelCheckpoint(sys.argv[1] +'.h5', monitor='val_loss', save_best_only=True)
+save_best = ModelCheckpoint('models/' +sys.argv[1] +'.h5', monitor='val_loss', save_best_only=True)
 
 # train
 history = model.fit_generator(data_generator('train', params['num_train_steps'], True, hdf5_path, params),

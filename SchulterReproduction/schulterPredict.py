@@ -27,10 +27,10 @@ params = load_parameters()
 
 
 # load model
-if not os.path.isfile('trained_model.h5'):
+if not os.path.isfile('models/' +sys.argv[1] +'.h5'):
     print('ERROR: No trained model found.')
     exit(0)
-model = load_model('trained_model.h5')
+model = load_model(sys.argv[1] +'.h5')
 
 # extract feature and reshape to (num_instances, image_height, image_width, num_channels)
 start_time=time.time()
@@ -43,7 +43,7 @@ print(start_Index,finish_Index)
 
 # for every frame, sliding across the chosen song
 # chose what portion out of 100% of the song to be analyzed
-for current_Index in range(start_Index,start_Index+int((finish_Index-start_Index)*float(int(sys.argv[1])/100))):
+for current_Index in range(start_Index,start_Index+int((finish_Index-start_Index)*float(int(sys.argv[3])/100))):
 	print('Frame Index: ',current_Index,'/',finish_Index)
 	# create a new subset nparray of size params['sample_frame_length']
 	windowed_feature = feature[:,current_Index-int(params['sample_frame_length']/2)-1:current_Index+int(params['sample_frame_length']/2)]
@@ -57,7 +57,7 @@ for current_Index in range(start_Index,start_Index+int((finish_Index-start_Index
 	frame_index_Value=current_Index*params['hop_length']/params['fs'],prediction,round_prediction
 	prediction_list.append(frame_index_Value)
 
-with open(sys.argv[2], "w") as csvFile:
+with open('songPredictions/' +sys.argv[2], "w") as csvFile:
     writer = csv.writer(csvFile)
     writer.writerows(prediction_list)
 csvFile.close()

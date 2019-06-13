@@ -36,7 +36,7 @@ num_val_instances = len(val_files)
 image_height=params['n_mel']
 image_width=int(np.round(params['max_song_length'] * params['fs'] / float(params['hop_length'])))
 
-dataset = h5py.File('jamendo/' +sys.argv[1] +'.hdf5', mode='w')
+dataset = h5py.File('hdf5data/' +sys.argv[1] +'.hdf5', mode='w')
 
 
 # we store one image per instance of size image_height x image_width holding floating point numbers
@@ -95,10 +95,10 @@ for k, audio_path in enumerate(train_files):
   dataset['train_lengths'][k, ...] = audio_melframe_nums
   song_list.append((k,os.path.basename(audio_path)))
 
-with open(sys.argv[1] +"_songTrainH5Id.csv", "w") as csvFile:
-    writer = csv.writer(csvFile)
-    writer.writerows(song_list)
-csvFile.close()
+# with open(sys.argv[1] +"_songTrainH5Id.csv", "w") as csvFile:
+#     writer = csv.writer(csvFile)
+#     writer.writerows(song_list)
+# csvFile.close()
 
 song_list=[]
 
@@ -132,7 +132,7 @@ for k, audio_path in enumerate(val_files):
   dataset['val_lengths'][k, ...] = audio_melframe_nums
   song_list.append((k,os.path.basename(audio_path)))
 
-with open(sys.argv[1] +"_songValH5Id.csv", "w") as csvFile:
-    writer = csv.writer(csvFile)
-    writer.writerows(song_list)
-csvFile.close()
+# with open(sys.argv[1] +"_songValH5Id.csv", "w") as csvFile:
+#     writer = csv.writer(csvFile)
+#     writer.writerows(song_list)
+# csvFile.close()
