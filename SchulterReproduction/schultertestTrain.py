@@ -10,13 +10,14 @@ import os
 import matplotlib.pyplot as plt
 import math
 import pdb
+import sys
 
 def load_parameters():
     return yaml.load(open('params.yaml'))
 
 params=load_parameters()
 
-hdf5_file=h5py.File('jamendo/jdataset.hdf5','r')
+hdf5_file=h5py.File('jamendo/' +sys.argv[1] +'.hdf5','r')
 
 label_dataset='train_labels'
 length_dataset='train_lengths'
@@ -25,8 +26,9 @@ feature_dataset='train_features'
 
 x_data = []
 y = []
+enum_y=[]
 # one loop per batch
-for j in range(params['batch_size']):
+for j in range(1000):
 	#random_song is the index of a random song entry
     random_song = random.randint(0,len(hdf5_file[label_dataset])-1)
     # = retrieves a feature from the shuffled list of songs
@@ -38,6 +40,7 @@ for j in range(params['batch_size']):
     # sample_excerpt must be a slice from the feature numpy
     sample_excerpt = feature[:,random_frame_index-int(params['sample_frame_length']/2)-1:random_frame_index+int(params['sample_frame_length']/2)]
     x_data.append(sample_excerpt)
+    enum_y.append(j)
     #convert samples into ms
     random_frame_time = random_frame_index*params['hop_length']/params['fs']
     #iterate through label_points rows until you find an entry number that is bigger than sample_excerpt_ms
@@ -59,19 +62,25 @@ for j in range(params['batch_size']):
             label=label_points[row][2]
             y.append(label)
             break
-    print("song_index",random_song)
-    print("song_num_frames", song_num_frames)
-    print("random_frame_index", random_frame_index)
-    print("random_frame_time", random_frame_time)
+    # print("song_index",random_song)
+    # print("song_num_frames", song_num_frames)
+    # print("random_frame_index", random_frame_index)
+    # print("random_frame_time", random_frame_time)
     # print("window_frame_boundaries",random_frame_index-int(params['sample_frame_length']/2)-1,random_frame_index+int(params['sample_frame_length']/2))
     # print("sample_excerpt.shape",sample_excerpt.shape)
-    print("y", y)
-    pdb.set_trace()
-x_data = np.asarray(x_data)
+    # print("y", y)
+    # pdb.set_trace()
+
+# x_data = np.asarray(x_data)
 # print(x_data.shape)
-y = np.asarray(y)
+# y = np.asarray(y)
 # print(y.shape)
 # conv layers need image data format
-x_data = x_data.reshape((x_data.shape[0], x_data.shape[1], x_data.shape[2], 1))
+# x_data = x_data.reshape((x_data.shape[0], x_data.shape[1], x_data.shape[2], 1))
 # pdb.set_trace()
 # send data at the end of each batch
+
+plt.plot(enum_y, y, 'bo', label='LabelList')
+plt.title('label output')
+plt.legend()
+plt.show()
