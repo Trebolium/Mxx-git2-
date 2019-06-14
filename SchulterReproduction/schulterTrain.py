@@ -7,7 +7,7 @@ try:
     from code.schultercore4 import *
 except ImportError:
     from schultercore4 import *   # when running from terminal, the directory may not be identified as a package
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 import os
 import matplotlib.pyplot as plt
 import sys
@@ -50,7 +50,7 @@ num_val_steps = params['num_train_steps'] * len(val_files)/len(train_files)
 # callbacks
 # save the best performing model
 save_best = ModelCheckpoint('models/' +sys.argv[2] +'.h5', monitor='val_loss', save_best_only=True)
-early_stop = EarlyStopping(monitor=‘val_loss’, min_delta=0, patience=5, verbose=0, mode=‘auto’, baseline=None, restore_best_weights=False)
+early_stop = EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto', baseline=None, restore_best_weights=False)
 
 print(params)
 
