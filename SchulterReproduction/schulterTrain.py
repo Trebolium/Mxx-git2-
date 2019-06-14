@@ -11,6 +11,10 @@ from keras.callbacks import ModelCheckpoint
 import os
 import matplotlib.pyplot as plt
 import sys
+import time
+
+start_time=time.time()
+print('Ignore this test print',time.time()-start_time)
 
 params=load_parameters()
 
@@ -54,6 +58,8 @@ history = model.fit_generator(data_generator('train', params['num_train_steps'],
                     validation_data=data_generator('val', num_val_steps, False, hdf5_path, params),
                     validation_steps=num_val_steps,
                     callbacks=[save_best])
+
+print(time.time()-start_time)
 
 # create metrics for visualising
 acc = history.history['acc']
