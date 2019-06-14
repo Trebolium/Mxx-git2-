@@ -57,7 +57,7 @@ for current_Index in range(start_Index,start_Index+int((finish_Index-start_Index
 	frame_index_Value=current_Index*params['hop_length']/params['fs'],prediction,round_prediction
 	prediction_list.append(frame_index_Value)
 
-with open('songPredictions/' +sys.argv[2], "w") as csvFile:
+with open('songPredictions/' +sys.argv[2] +'.csv', "w") as csvFile:
     writer = csv.writer(csvFile)
     writer.writerows(prediction_list)
 csvFile.close()
