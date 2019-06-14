@@ -50,6 +50,7 @@ num_val_steps = params['num_train_steps'] * len(val_files)/len(train_files)
 # callbacks
 # save the best performing model
 save_best = ModelCheckpoint('models/' +sys.argv[2] +'.h5', monitor='val_loss', save_best_only=True)
+early_stop = EarlyStopping(monitor=‘val_loss’, min_delta=0, patience=5, verbose=0, mode=‘auto’, baseline=None, restore_best_weights=False)
 
 print(params)
 
@@ -59,7 +60,7 @@ history = model.fit_generator(data_generator('train', params['num_train_steps'],
                     epochs=params['epochs'],
                     validation_data=data_generator('val', num_val_steps, False, hdf5_path, params),
                     validation_steps=num_val_steps,
-                    callbacks=[save_best])
+                    callbacks=[save_best,early_stop])
 print(params)
 print(time.time()-start_time)
 
