@@ -51,6 +51,8 @@ num_val_steps = params['num_train_steps'] * len(val_files)/len(train_files)
 # save the best performing model
 save_best = ModelCheckpoint('models/' +sys.argv[2] +'.h5', monitor='val_loss', save_best_only=True)
 
+print(params)
+
 # train
 history = model.fit_generator(data_generator('train', params['num_train_steps'], True, hdf5_path, params),
                     steps_per_epoch=params['num_train_steps'],
@@ -58,7 +60,7 @@ history = model.fit_generator(data_generator('train', params['num_train_steps'],
                     validation_data=data_generator('val', num_val_steps, False, hdf5_path, params),
                     validation_steps=num_val_steps,
                     callbacks=[save_best])
-
+print(params)
 print(time.time()-start_time)
 
 # create metrics for visualising

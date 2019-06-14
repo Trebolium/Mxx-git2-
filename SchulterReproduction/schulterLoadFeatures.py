@@ -13,6 +13,7 @@ import math
 import sys
 
 params=load_parameters()
+print(params)
 
 print('gathering files...')
 train_dir = 'jamendo/audioTrain/'
