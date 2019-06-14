@@ -71,14 +71,14 @@ def generate_network(params):
         keras model object.
     """
     # pre-compute "image" height and width
-    image_height = params['n_mel']
+    # image_height = params['n_mel']
     # time to frames
-    image_width = int(np.round(params['max_song_length'] * params['fs'] / float(params['hop_length'])))
+    # image_width = int(np.round(params['max_song_length'] * params['fs'] / float(params['hop_length'])))
 
     # standard
     model = models.Sequential()
     # ***change inputs to match melspec tensors***
-    model.add(layers.Conv2D(64, (3, 3), activation='relu', input_shape=(image_height, params['sample_frame_length'], 1)))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu', input_shape=(params['n_mel'], params['sample_frame_length'], 1)))
     model.add(layers.Conv2D(32, (3, 3), activation='relu'))
     model.add(layers.MaxPooling2D((3, 3)))
     model.add(layers.Conv2D(128, (3, 3), activation='relu'))
