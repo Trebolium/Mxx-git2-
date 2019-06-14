@@ -9,7 +9,7 @@ fmin: 27.5
 fmax: 8000
 max_song_length: 450
 # NETWORK
-# initial_lr: 0.0001
+learning_rate: 0.0001
 epochs: 100
 num_train_steps: 4000
 batch_size: 32
