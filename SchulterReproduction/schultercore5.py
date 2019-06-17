@@ -181,7 +181,7 @@ def val_generator(num_steps, shuffle, h5_path, params):
 
     hdf5_file = h5py.File(h5_path, "r")  # open hdf5 file in read mode
     # point to the correct feature and label dataset
-    counter=0
+    batch_iterator=0
     song_index=0
   
     while 1: # while 1 is the same is while True - an infinite loop!
@@ -189,15 +189,21 @@ def val_generator(num_steps, shuffle, h5_path, params):
         #     print("Numsteps: " +str(i+1) +"/" +str(num_steps))
         x_data = []
         y = []
-        
         # one loop per batch
+        sample_index=0
         for j in range(params['batch_size']):
-            # = retrieves a feature from the shuffled list of songs
-            feature = hdf5_file['val_features'][song_index, ...]
-            # find how many samples are in this song by looking up lengths
             song_num_frames = hdf5_file['val_lengths'][song_index, ...]
-            for k in range(int(params['sample_frame_length']/2)+1,song_num_frames-int(params['sample_frame_length']/2)-1):
-                sample_excerpt = feature[:,k-int(params['sample_frame_length']/2)-1:k+int(params['sample_frame_length']/2)]
+            if sample_index>=(song_num_frames-int(params['sample_frame_length']/2)-1):
+                batch_iterator=0
+                song_index+=1
+                break
+            else:
+                offset=batch_iterator*params['batch_size']
+                # = retrieves a feature from the shuffled list of songs
+                feature = hdf5_file['val_features'][song_index, ...]
+                # find how many samples are in this song by looking up lengths
+                # for k in range(int(params['sample_frame_length']/2)+1,song_num_frames-int(params['sample_frame_length']/2)-1):
+                sample_excerpt = feature[:,sample_index+offset-int(params['sample_frame_length']/2)-1:sample_index+offset+int(params['sample_frame_length']/2)]
                 x_data.append(sample_excerpt)
                 frame_time = j*params['hop_length']/params['fs']
                 label_points=hdf5_file['val_labels'][song_index, ...]
@@ -231,6 +237,7 @@ def val_generator(num_steps, shuffle, h5_path, params):
             x_data = x_data.reshape((x_data.shape[0], x_data.shape[1], x_data.shape[2], 1))
             # pdb.set_trace()
             # send data at the end of each batch
-            counter +=1
-            song_index +=1
+            batch_iterator +=1
+            sample_index+=1
+            # song_index +=1
             yield x_data, y
