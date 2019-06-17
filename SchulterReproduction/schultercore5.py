@@ -148,6 +148,7 @@ def train_generator(num_steps, shuffle, h5_path, params):
             #iterate through label_points rows until you find an entry number that is bigger than sample_excerpt_ms
             # if previous entry is even, there are vocals (1). Else no vocals (0)
             label_points=hdf5_file['train_labels'][random_song, ...]
+           
             # determine via sample location whether window has vocals or not by comparing to csv
             previous_value=-1
             for row in range(500):
@@ -162,9 +163,10 @@ def train_generator(num_steps, shuffle, h5_path, params):
                     else:
                         previous_value=label_points[row][0]
                 else:
-                    label=label_points[row][2]
+                    label=label_points[row-1][2]
                     y.append(label)
                     break
+
         x_data = np.asarray(x_data)
         # print(x_data.shape)
         y = np.asarray(y)
@@ -179,53 +181,56 @@ def val_generator(num_steps, shuffle, h5_path, params):
 
     hdf5_file = h5py.File(h5_path, "r")  # open hdf5 file in read mode
     # point to the correct feature and label dataset
+    counter=0
+    song_index=0
   
     while 1: # while 1 is the same is while True - an infinite loop!
         # for i in range(num_steps):  # one loop per epoch
         #     print("Numsteps: " +str(i+1) +"/" +str(num_steps))
         x_data = []
         y = []
+        
         # one loop per batch
-        for j in range((params['batch_size']/2)):
+        for j in range(params['batch_size']):
             # = retrieves a feature from the shuffled list of songs
-            feature = hdf5_file['val_features'][j, ...]
+            feature = hdf5_file['val_features'][song_index, ...]
             # find how many samples are in this song by looking up lengths
-            song_num_frames = hdf5_file['val_lengths'][j, ...]
+            song_num_frames = hdf5_file['val_lengths'][song_index, ...]
             for k in range(int(params['sample_frame_length']/2)+1,song_num_frames-int(params['sample_frame_length']/2)-1):
-                
-            #randomly take a section between 0 and the max available frame of a song which is as described below. Minusing one just 
-            random_frame_index = random.randint(int(params['sample_frame_length']/2)+1,song_num_frames-int(params['sample_frame_length']/2)-1)
-            # sample_excerpt must be a 115 frame slice from the feature numpy
-            sample_excerpt = feature[:,random_frame_index-int(params['sample_frame_length']/2)-1:random_frame_index+int(params['sample_frame_length']/2)]
-            x_data.append(sample_excerpt)
-            #convert random frame placement to ms
-            random_frame_time = random_frame_index*params['hop_length']/params['fs']
-            #iterate through label_points rows until you find an entry number that is bigger than sample_excerpt_ms
-            # if previous entry is even, there are vocals (1). Else no  vocals (0)
-            label_points=hdf5_file['val_labels'][j, ...]
-            # determine via sample location whether window has vocals or not by comparing to csv
-            previous_value=-1
-            for row in range(500):
-                # if the row is not the last (after last row value comes zero padding)
-                if label_points[row][0]>previous_value:
-                    # if label exceeds time instance of random frame
-                    if label_points[row][0]>random_frame_time:
-                        # go back one and get label, third element holds the label
+                sample_excerpt = feature[:,k-int(params['sample_frame_length']/2)-1:k+int(params['sample_frame_length']/2)]
+                x_data.append(sample_excerpt)
+                frame_time = j*params['hop_length']/params['fs']
+                label_points=hdf5_file['val_labels'][song_index, ...]
+
+                previous_value=-1
+                for row in range(500):
+                    # if row is iterated into zero-padded territory, then we need a safety net
+                    # that checks if the cuurrent row's contents (label_points[row][0]) are higher than the previous row (previous_value)
+                    # the following if statement will always be true until we get to the edge of the valid label_point entries
+                    if label_points[row][0]>previous_value:
+                        # what if the final random frame happens to be after the last label_point?
+                        # The the label+point would have to get ahead of the final frame, which would bring us to
+                        # compare values of padded zeros
+                        if label_points[row][0]>frame_time:
+                            # go back one and get label, third element holds the label
+                            label=label_points[row-1][2]
+                            y.append(label)
+                            break
+                        else:
+                            previous_value=label_points[row][0]
+                    else:
                         label=label_points[row-1][2]
                         y.append(label)
                         break
-                    else:
-                        previous_value=label_points[row][0]
-                else:
-                    label=label_points[row][2]
-                    y.append(label)
-                    break
-        x_data = np.asarray(x_data)
-        # print(x_data.shape)
-        y = np.asarray(y)
-        # print(y.shape)
-        # conv layers need image data format
-        x_data = x_data.reshape((x_data.shape[0], x_data.shape[1], x_data.shape[2], 1))
-        # pdb.set_trace()
-        # send data at the end of each batch
-        yield x_data, y
+
+            x_data = np.asarray(x_data)
+            # print(x_data.shape)
+            y = np.asarray(y)
+            # print(y.shape)
+            # conv layers need image data format
+            x_data = x_data.reshape((x_data.shape[0], x_data.shape[1], x_data.shape[2], 1))
+            # pdb.set_trace()
+            # send data at the end of each batch
+            counter +=1
+            song_index +=1
+            yield x_data, y

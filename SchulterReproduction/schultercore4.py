@@ -94,8 +94,8 @@ def generate_network(params):
 
     from keras import optimizers
 
-    model.compile(loss='binary_crossentropy', optimizer=optimizers.SGD(lr=params['learning_rate'], momentum=0.95, decay=0.85, nesterov=True), metrics=['acc'])
-    # model.compile(loss='binary_crossentropy', optimizer=optimizers.Adam(lr=params['learning_rate']), metrics=['acc'])
+    # model.compile(loss='binary_crossentropy', optimizer=optimizers.SGD(lr=params['learning_rate'], momentum=0.95, decay=0.85, nesterov=True), metrics=['acc'])
+    model.compile(loss='binary_crossentropy', optimizer=optimizers.Adam(lr=params['learning_rate']), metrics=['acc'])
 
     return model
 
@@ -164,7 +164,7 @@ def data_generator(dataset, num_steps, shuffle, h5_path, params):
                     else:
                         previous_value=label_points[row][0]
                 else:
-                    label=label_points[row][2]
+                    label=label_points[row-1][2]
                     y.append(label)
                     break
         x_data = np.asarray(x_data)
