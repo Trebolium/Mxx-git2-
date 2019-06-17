@@ -10,7 +10,7 @@ import sys
 import time
 
 start_time=time.time()
-print('Ignore this test print' +(time.time()-start_time))
+print('Ignore this test print' +str(time.time()-start_time))
 
 params=load_parameters()
 
