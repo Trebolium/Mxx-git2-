@@ -94,8 +94,8 @@ def generate_network(params):
 
     from keras import optimizers
 
-    # model.compile(loss='binary_crossentropy', optimizer=optimizers.SGD(lr=params['learning_rate'], momentum=0.95, decay=0.85, nesterov=True), metrics=['acc'])
-    model.compile(loss='binary_crossentropy', optimizer=optimizers.Adam(lr=params['learning_rate']), metrics=['acc'])
+    model.compile(loss='binary_crossentropy', optimizer=optimizers.SGD(lr=params['learning_rate'], momentum=0.95, decay=0.85, nesterov=True), metrics=['acc'])
+    # model.compile(loss='binary_crossentropy', optimizer=optimizers.Adam(lr=params['learning_rate']), metrics=['acc'])
 
     return model
 

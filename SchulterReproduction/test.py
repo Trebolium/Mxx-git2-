@@ -1,11 +1,6 @@
-try:
-    from code.schultercore4 import *
-except ImportError:
-    from schultercore4 import *   # when running from terminal, the directory may not be identified as a package
-import os
-import matplotlib.pyplot as plt
-import sys
-import time
+import pickle
 
-params=load_parameters()
-print(params)
+pickle_in=open('modelHistory/deletehistory.pickle','rb')
+example_dict=pickle.load(pickle_in)
+
+print(example_dict['loss'])

@@ -1,20 +1,16 @@
-"""
-STEP 2: Train a DNN to classify sounds as either 'cello' or 'applause'. This is a toy example and we are only training
-for 5 epochs. Validation accuracy should go above 95%.
-"""
-
 try:
     from code.schultercore4 import *
 except ImportError:
     from schultercore4 import *   # when running from terminal, the directory may not be identified as a package
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 import os
+import pickle
 import matplotlib.pyplot as plt
 import sys
 import time
 
 start_time=time.time()
-print('Ignore this test print',time.time()-start_time)
+print('Ignore this test print' +(time.time()-start_time))
 
 params=load_parameters()
 
@@ -50,7 +46,7 @@ num_val_steps = params['num_train_steps'] * len(val_files)/len(train_files)
 # callbacks
 # save the best performing model
 save_best = ModelCheckpoint('models/' +sys.argv[2] +'.h5', monitor='val_loss', save_best_only=True)
-early_stop = EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto', baseline=None, restore_best_weights=False)
+early_stop = EarlyStopping(monitor='val_loss', min_delta=0, patience=1, verbose=0, mode='auto', baseline=None, restore_best_weights=False)
 
 print(params)
 
@@ -62,22 +58,9 @@ history = model.fit_generator(data_generator('train', params['num_train_steps'],
                     validation_steps=num_val_steps,
                     callbacks=[save_best,early_stop])
 print(params)
-print(time.time()-start_time)
+print('Training took: ' +str(time.time()-start_time))
 
-# create metrics for visualising
-acc = history.history['acc']
-val_acc = history.history['val_acc']
-loss = history.history['loss']
-val_loss = history.history['val_loss']
-epochs = range(1, len(acc) + 1)
-plt.plot(epochs, acc, 'bo', label='Training acc')
-plt.plot(epochs, val_acc, 'b', label='Validation acc')
-plt.title('Data: ' +sys.argv[1] +', Model: ' +sys.argv[2] +', Training and validation loss')
-plt.legend()
-
-plt.figure()
-plt.plot(epochs, loss, 'bo', label='Training loss')
-plt.plot(epochs, val_loss, 'b', label='Validation loss')
-plt.title('Data: ' +sys.argv[1] +', Model: ' +sys.argv[2] +', Training and validation loss')
-plt.legend()
-plt.show()
+# save model history to disk as the same name as model
+pickle_out = open('modelHistory/' +sys.argv[2] +'history.pickle', 'wb')
+pickle.dump(history.history, pickle_out)
+pickle_out.close()
