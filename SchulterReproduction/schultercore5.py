@@ -108,7 +108,7 @@ def generate_network(params):
 
 
 
-def train_generator(num_steps, shuffle, h5_path, params):
+def train_generator(num_steps, h5_path, params):
     """
     Data generator for training: Supplies the train method with features and labels taken from the hdf5 file
 
@@ -177,67 +177,69 @@ def train_generator(num_steps, shuffle, h5_path, params):
         # send data at the end of each batch
         yield x_data, y
 
-def val_generator(num_steps, shuffle, h5_path, params):
+def val_generator(num_steps,h5_path, params):
 
     hdf5_file = h5py.File(h5_path, "r")  # open hdf5 file in read mode
-    # point to the correct feature and label dataset
-    batch_iterator=0
     song_index=0
-  
-    while 1: # while 1 is the same is while True - an infinite loop!
-        # for i in range(num_steps):  # one loop per epoch
-        #     print("Numsteps: " +str(i+1) +"/" +str(num_steps))
-        x_data = []
-        y = []
-        # one loop per batch
-        sample_index=0
-        for j in range(params['batch_size']):
-            song_num_frames = hdf5_file['val_lengths'][song_index, ...]
-            if sample_index>=(song_num_frames-int(params['sample_frame_length']/2)-1):
-                batch_iterator=0
-                song_index+=1
-                break
-            else:
-                offset=batch_iterator*params['batch_size']
-                # = retrieves a feature from the shuffled list of songs
-                feature = hdf5_file['val_features'][song_index, ...]
-                # find how many samples are in this song by looking up lengths
-                # for k in range(int(params['sample_frame_length']/2)+1,song_num_frames-int(params['sample_frame_length']/2)-1):
-                sample_excerpt = feature[:,sample_index+offset-int(params['sample_frame_length']/2)-1:sample_index+offset+int(params['sample_frame_length']/2)]
-                x_data.append(sample_excerpt)
-                frame_time = j*params['hop_length']/params['fs']
-                label_points=hdf5_file['val_labels'][song_index, ...]
+    song_num_frames = hdf5_file['val_lengths'][song_index, ...]
+    sample_index = int(params['sample_frame_length']/2)
 
-                previous_value=-1
-                for row in range(500):
-                    # if row is iterated into zero-padded territory, then we need a safety net
-                    # that checks if the cuurrent row's contents (label_points[row][0]) are higher than the previous row (previous_value)
-                    # the following if statement will always be true until we get to the edge of the valid label_point entries
-                    if label_points[row][0]>previous_value:
-                        # what if the final random frame happens to be after the last label_point?
-                        # The the label+point would have to get ahead of the final frame, which would bring us to
-                        # compare values of padded zeros
-                        if label_points[row][0]>frame_time:
-                            # go back one and get label, third element holds the label
-                            label=label_points[row-1][2]
-                            y.append(label)
-                            break
+    while 1:
+        # print('StartLoop batch_iterator: ',batch_iterator)
+        breakout=False
+        song_num_frames = hdf5_file['val_lengths'][song_index, ...]
+        sample_index = int(params['sample_frame_length']/2)
+        # FICX THIS
+        for i in range(num_steps):
+            x_data=[]
+            y=[]
+            batch_offset=i*params['batch_size']
+            # print('batch_offset: ', batch_offset)
+            sample_index=+int(params['sample_frame_length']/2)+batch_offset
+            for j in range(params['batch_size']):        
+                if sample_index>=(song_num_frames-int(params['sample_frame_length']/2)-1):
+                    # batch_iterator=0
+                    sample_index=0
+                    song_index+=1
+                    breakout=True
+                    break
+                else:
+                    feature = hdf5_file['val_features'][song_index, ...]
+                    # find how many samples are in this song by looking up lengths
+                    # for k in range(int(params['sample_frame_length']/2)+1,song_num_frames-int(params['sample_frame_length']/2)-1):
+                    sample_excerpt = feature[:,sample_index-int(params['sample_frame_length']/2):sample_index+int(params['sample_frame_length']/2)+1]
+                    x_data.append(sample_excerpt)
+                    frame_time = sample_index*params['hop_length']/params['fs']
+                    label_points=hdf5_file['val_labels'][song_index, ...]
+
+                    previous_value=-1
+                    for row in range(500):
+                        # if row is iterated into zero-padded territory, then we need a safety net
+                        # that checks if the cuurrent row's contents (label_points[row][0]) are higher than the previous row (previous_value)
+                        # the following if statement will always be true until we get to the edge of the valid label_point entries
+                        if label_points[row][0]>previous_value:
+                            # what if the final random frame happens to be after the last label_point?
+                            # The the label+point would have to get ahead of the final frame, which would bring us to
+                            # compare values of padded zeros
+                            if label_points[row][0]>frame_time:
+                                # go back one and get label, third element holds the label
+                                y.append(label_points[row-1][2])
+                                # print('label: ',label)
+                                break
+                            else:
+                                previous_value=label_points[row][0]
                         else:
-                            previous_value=label_points[row][0]
-                    else:
-                        label=label_points[row-1][2]
-                        y.append(label)
-                        break
-
+                            y.append(label_points[row-1][2])
+                            # print('label: ',label)
+                            break
+                # pdb.set_trace()
+                # print('sample_index, frame time: ', sample_index,frame_time)
+                # print('window size: ',sample_index-int(params['sample_frame_length']/2),sample_index+int(params['sample_frame_length']/2))
+                # print('excerpt shape: ',sample_excerpt.shape)
+                sample_index+=1
+            if breakout==True:
+                break
             x_data = np.asarray(x_data)
-            # print(x_data.shape)
-            y = np.asarray(y)
-            # print(y.shape)
-            # conv layers need image data format
             x_data = x_data.reshape((x_data.shape[0], x_data.shape[1], x_data.shape[2], 1))
-            # pdb.set_trace()
-            # send data at the end of each batch
-            batch_iterator +=1
-            sample_index+=1
-            # song_index +=1
+            y = np.asarray(y)
             yield x_data, y

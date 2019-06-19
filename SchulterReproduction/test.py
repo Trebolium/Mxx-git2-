@@ -1,6 +1,8 @@
-import pickle
+import sys
 
-pickle_in=open('modelHistory/deletehistory.pickle','rb')
-example_dict=pickle.load(pickle_in)
+num_val_steps=0
 
-print(example_dict['loss'])
+for i in range(int(sys.argv[1])):
+	num_val_steps = num_val_steps + i*i
+
+print(num_val_steps)

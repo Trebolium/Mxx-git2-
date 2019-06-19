@@ -9,16 +9,18 @@ import math
 import pdb
 import sys
 
-data=h5py.File('jamendo/jdataset.hdf5','r')
+data=h5py.File('hdf5data/basic.hdf5','r')
 
 tlab='train_labels'
 tlen='train_lengths'
 tfea='train_features'
+vlab='val_labels'
+vlen='val_lengths'
+vfea='val_features'
 
-pdb.set_trace()
 
-song=int(sys.argv[1])
+# pdb.set_trace()
 
-for i in range(int(sys.argv[2])):
-	print(data[tlab][song][i])
+
+print(data[vlen][int(sys.argv[1])])
 	
